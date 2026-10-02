@@ -34,34 +34,34 @@ $(wildcard ../makefile.init) \
 $(wildcard ../makefile.targets) \
 
 
-BUILD_ARTIFACT_NAME := read_sensor
+BUILD_ARTIFACT_NAME := bachelor_weather
 BUILD_ARTIFACT_EXTENSION := elf
 BUILD_ARTIFACT_PREFIX :=
 BUILD_ARTIFACT := $(BUILD_ARTIFACT_PREFIX)$(BUILD_ARTIFACT_NAME)$(if $(BUILD_ARTIFACT_EXTENSION),.$(BUILD_ARTIFACT_EXTENSION),)
 
 # Add inputs and outputs from these tool invocations to the build variables 
 EXECUTABLES += \
-read_sensor.elf \
+bachelor_weather.elf \
 
 MAP_FILES += \
-read_sensor.map \
+bachelor_weather.map \
 
 SIZE_OUTPUT += \
 default.size.stdout \
 
 OBJDUMP_LIST += \
-read_sensor.list \
+bachelor_weather.list \
 
 
 # All Target
 all: main-build
 
 # Main-build Target
-main-build: read_sensor.elf secondary-outputs
+main-build: bachelor_weather.elf secondary-outputs
 
 # Tool invocations
-read_sensor.elf read_sensor.map: $(OBJS) $(USER_OBJS) C:\Users\marko\OneDrive\Dokumente\read_sensor\STM32L476RGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "read_sensor.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\marko\OneDrive\Dokumente\read_sensor\STM32L476RGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="read_sensor.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+bachelor_weather.elf bachelor_weather.map: $(OBJS) $(USER_OBJS) C:\Users\marko\OneDrive\Dokumente\bachelorarbeit\read_sensor\STM32L476RGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "bachelor_weather.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\marko\OneDrive\Dokumente\bachelorarbeit\read_sensor\STM32L476RGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="bachelor_weather.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -70,14 +70,14 @@ default.size.stdout: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
 	@echo 'Finished building: $@'
 	@echo ' '
 
-read_sensor.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "read_sensor.list"
+bachelor_weather.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "bachelor_weather.list"
 	@echo 'Finished building: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) default.size.stdout read_sensor.elf read_sensor.list read_sensor.map
+	-$(RM) bachelor_weather.elf bachelor_weather.list bachelor_weather.map default.size.stdout
 	-@echo ' '
 
 secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST)
