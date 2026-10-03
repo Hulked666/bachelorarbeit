@@ -137,3 +137,50 @@ static HAL_StatusTypeDef write_data(uint8_t data){
 	 }
 	 return HAL_OK;
  }
+
+ HAL_StatusTypeDef draw_pixel(uint16_t x,uint16_t y,uint16_t color){
+	 HAL_StatusTypeDef status;
+	 uint8_t pixel[2];
+	 if((x >= 320) || (y >= 240)){
+		 return HAL_ERROR;
+	 }
+	 status = set_window(x,y,x,y);
+	 if(status != HAL_OK){
+		 return status;
+	 }
+	 pixel[0] = (color >> 8 );
+	 pixel[1] = (color & (0xFF));
+
+	 status = write_data_buffer(pixel,2);
+	 if(status != HAL_OK){
+		 return status;
+	 }
+
+	 return HAL_OK;
+ }
+
+ HAL_StatusTypeDef fill_screen(uint16_t color){
+	 HAL_StatusTypeDef status;
+	 uint8_t buffer[200];
+	 uint32_t pixel_rest = (320 * 240);
+	 status = set_window(0,0,319,239);
+	 if(status != HAL_OK){
+		 return status;
+	 }
+
+	 for(int i = 0; i < 200; i+= 2){
+		 buffer[i] = (color >> 8);
+		 buffer[i+1] = (color & 0xFF);
+	 }
+
+	 while (pixel_rest > 0){
+		 status = write_data_buffer(buffer,200);
+		 if(status != HAL_OK){
+			 return status;
+		 }
+
+		 pixel_rest -= 100;
+	 }
+
+	 return HAL_OK;
+ }
