@@ -16,6 +16,13 @@ static const uint8_t disp_orient = 0x28;
 static const uint8_t set_window_x = 0x2A;
 static const uint8_t set_window_y = 0x2B;
 static const uint8_t mem_write = 0x2C;
+static const uint16_t schwarz =  0x0000;
+static const uint16_t weiß = 0xFFFF;
+static const uint16_t blau = 0x001F;
+static const uint16_t cyan = 0x07FF;
+static const uint16_t gelb = 0xFFE0;
+static const uint16_t orange = 0xFD20;
+static const uint16_t rot = 0xF800;
 
 static HAL_StatusTypeDef write_command(uint8_t command){
 	HAL_StatusTypeDef status;
@@ -182,5 +189,49 @@ static HAL_StatusTypeDef write_data(uint8_t data){
 		 pixel_rest -= 100;
 	 }
 
+	 return HAL_OK;
+ }
+
+ HAL_StatusTypeDef draw_rectangle(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t color){
+	 HAL_StatusTypeDef status;
+	 if((width == 0) || (height == 0)){
+		 return HAL_ERROR;
+	 }
+
+	 if((x >= 320) || (y >= 240)){
+		 return HAL_ERROR;
+	 }
+
+	 if((((uint32_t)x + width) > 320) || (((uint32_t)y + height) > 240)){
+		 return HAL_ERROR;
+	 }
+	 uint16_t x2 = x + width - 1;
+	 uint16_t y2 = y + height - 1;
+	 uint32_t pixel_count = (uint32_t)height * width;
+	 status = set_window(x,y,x2,y2);
+	 if(status != HAL_OK){
+		 return status;
+	 }
+
+	 uint8_t buffer[200];
+
+	for(int i = 0; i < 200; i += 2){
+		buffer[i] = (color >> 8);
+		buffer[i+1] = (color & 0xFF);
+	}
+
+	while(pixel_count > 0){
+		uint32_t pixel_to_send;
+		if(pixel_count >= 100){
+			pixel_to_send = 100;
+		}else{
+			pixel_to_send = pixel_count;
+		}
+		status = write_data_buffer(buffer,(pixel_to_send * 2));
+		if(status != HAL_OK){
+			return status;
+		}
+		pixel_count -= pixel_to_send ;
+	}
 	 return HAL_OK;
  }
