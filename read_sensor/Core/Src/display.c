@@ -236,28 +236,19 @@ static HAL_StatusTypeDef write_data(uint8_t data){
 	 return HAL_OK;
  }
 HAL_StatusTypeDef draw_char(uint16_t x, uint16_t y, char value, uint16_t color){
- uint8_t buffer[7];
-if (value == 'A'){
-	buffer[0] = 0b01110;
-	buffer[1] = 0b10001;
-	buffer[2] = 0b10001;
-	buffer[3] = 0b11111;
-	buffer[4] = 0b10001;
-	buffer[5] = 0b10001;
-	buffer[6] = 0b10001;
-}else if(value == 'B'){
-	buffer[0] = 0b11111;
-	buffer[1] = 0b10001;
-	buffer[2] = 0b10001;
-	buffer[3] = 0b11111;
-	buffer[4] = 0b10001;
-	buffer[5] = 0b10001;
-	buffer[6] = 0b11111;
+
+uint8_t index;
+if((value >= 'A') ||(value <= 'Z')){
+	index = value - 'A';
+}else if((value >= '0') && (value <= '9')){
+	index = 26 +(value - '0');
+}else{
+	return HAL_ERROR;
 }
 
 HAL_StatusTypeDef status;
  for(int i= 0; i < 7; i++){
-	 uint8_t row_data = buffer[i];
+	 uint8_t row_data = font[index][i];
 	 for(int j = 0; j < 5; j++ ){
 		 int bit_position = 4 - j;
 		 if((row_data & (1U << bit_position)) != 0){
