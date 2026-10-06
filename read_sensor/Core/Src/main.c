@@ -18,6 +18,9 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include <stdio.h>
+#include <string.h>
+#include "display.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -99,6 +102,16 @@ int main(void)
   MX_USART2_UART_Init();
   MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
+  HAL_Delay(500);
+
+  display_init();
+
+  fill_screen(COLOR_BLUE);
+
+
+  draw_char(10, 20, '.', COLOR_WHITE, 3);
+  draw_char(40, 20, '%', COLOR_WHITE, 3);
+  draw_char(80, 20, ':', COLOR_WHITE, 3);
 
 
 

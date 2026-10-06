@@ -1,5 +1,6 @@
 #include "display.h"
 #include "main.h"
+#include "font.h"
 
 
 
@@ -235,14 +236,34 @@ static HAL_StatusTypeDef write_data(uint8_t data){
 	}
 	 return HAL_OK;
  }
-HAL_StatusTypeDef draw_char(uint16_t x, uint16_t y, char value, uint16_t color){
+HAL_StatusTypeDef draw_char(uint16_t x, uint16_t y, char value, uint16_t color, uint8_t scale){
+if(scale == 0){
+	return HAL_ERROR;
+}
 
+if(((uint32_t)x + (5 * scale))> 320 || ((uint32_t)y +(7 * scale)) > 240){
+	return HAL_ERROR;
+}
 uint8_t index;
-if((value >= 'A') ||(value <= 'Z')){
+if(value == ' '){
+	return HAL_OK;
+}
+if((value >= 'A') &&(value <= 'Z')){
 	index = value - 'A';
 }else if((value >= '0') && (value <= '9')){
 	index = 26 +(value - '0');
-}else{
+}else if(value == '.'){
+	index = 36;
+}else if(value == ':'){
+	index = 37;
+}else if(value == '-'){
+	index = 38;
+}else if(value == '%'){
+	index = 39;
+}else if((uint8_t)value == 0xB0){
+	index = 40;
+}
+else{
 	return HAL_ERROR;
 }
 
@@ -252,7 +273,7 @@ HAL_StatusTypeDef status;
 	 for(int j = 0; j < 5; j++ ){
 		 int bit_position = 4 - j;
 		 if((row_data & (1U << bit_position)) != 0){
-			status = draw_pixel(x + j, y + i, color);
+			status = draw_rectangle(x + (j * scale), y + (i * scale),scale,scale, color);
 				if(status != HAL_OK){
 					return status;
 				}
@@ -262,4 +283,18 @@ HAL_StatusTypeDef status;
 
  }
  return HAL_OK;
+}
+
+HAL_StatusTypeDef draw_text(uint16_t x, uint16_t y, const char *text, uint16_t color, uint8_t scale){
+	HAL_StatusTypeDef status;
+	uint16_t i=0;
+	while(text[i] != '\0'){
+		status = draw_char(x,y,text[i],color,scale);
+		if(status != HAL_OK){
+			return status;
+		}
+		x += (6 * scale);
+		i++;
+	}
+	return HAL_OK;
 }

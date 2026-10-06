@@ -13,7 +13,7 @@ uint8_t resetReg = 0xE0;
 uint8_t calibReg = 0x88;
 uint8_t calibReg2 = 0xE1;
 uint8_t reg_ctrl_hum = 0xF2;
-uint8_t reg_sctrl_meas =  0xf4;
+uint8_t reg_ctrl_meas =  0xf4;
 uint8_t reg_status = 0xf3;
 uint8_t reg_raw_data = 0xf7;
 
@@ -194,7 +194,7 @@ calibrationData_t calibrationData;
 static HAL_StatusTypeDef set_hum_oversampling(void){
 	HAL_StatusTypeDef status;
 	uint8_t rate = 0x01;
-	status = write_register(reg_ctlr_hum, &rate,1);
+	status = write_register(reg_ctrl_hum, &rate,1);
 	return status;
 }
 
@@ -268,7 +268,7 @@ static HAL_StatusTypeDef read_raw_data(void){
 
 }
 
-static uint32_t compensate_temp(uint32_t adc_T){
+static int32_t compensate_temp(int32_t adc_T){
     int32_t var1;
     int32_t var2;
     int32_t temperature;
@@ -368,7 +368,7 @@ static uint32_t compensate_humidity(uint16_t adc_H)
     return (uint32_t)(value >> 12);
 }
 
-HAL_StatusTypeDef BME280ReadMesurements(float *temperature, *pressure, *humidity){
+HAL_StatusTypeDef BME280ReadMesurements(float *temperature, float *pressure, float *humidity){
 	HAL_StatusTypeDef status;
 	status = trigger_forced_mes();
 	if(status != HAL_OK){
@@ -386,8 +386,10 @@ HAL_StatusTypeDef BME280ReadMesurements(float *temperature, *pressure, *humidity
 		}
 
 
-	*temperature = compensate_temp(raw_temp) / 100.f;
+	*temperature = compensate_temp(raw_temperature) / 100.f;
 	*pressure = compensate_pressure(raw_pressure) / 25600.0f;
 	*humidity = compensate_humidity(raw_humidity) / 1024.0f;
+
+	return HAL_OK;
 }
 

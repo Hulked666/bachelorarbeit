@@ -1,0 +1,11 @@
+../Core/Src/display.c:28:26:write_command	24	static
+../Core/Src/display.c:39:26:write_data	24	static
+../Core/Src/display.c:50:27:write_data_buffer	24	static
+../Core/Src/display.c:59:14:hardware_reset	8	static
+../Core/Src/display.c:66:20:display_init	16	static
+../Core/Src/display.c:112:20:set_window	32	static
+../Core/Src/display.c:149:20:draw_pixel	24	static
+../Core/Src/display.c:170:20:fill_screen	232	static
+../Core/Src/display.c:196:20:draw_rectangle	248	static
+../Core/Src/display.c:239:19:draw_char	56	static
+../Core/Src/display.c:284:19:draw_text	48	static
