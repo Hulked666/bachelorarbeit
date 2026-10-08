@@ -8,4 +8,4 @@
 ../Core/Src/display.c:170:20:fill_screen	232	static
 ../Core/Src/display.c:196:20:draw_rectangle	248	static
 ../Core/Src/display.c:239:19:draw_char	56	static
-../Core/Src/display.c:284:19:draw_text	48	static
+../Core/Src/display.c:288:19:draw_text	48	static

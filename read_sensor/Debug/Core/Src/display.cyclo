@@ -7,5 +7,5 @@
 ../Core/Src/display.c:149:20:draw_pixel	5
 ../Core/Src/display.c:170:20:fill_screen	5
 ../Core/Src/display.c:196:20:draw_rectangle	12
-../Core/Src/display.c:239:19:draw_char	16
-../Core/Src/display.c:284:19:draw_text	3
+../Core/Src/display.c:239:19:draw_char	18
+../Core/Src/display.c:288:19:draw_text	3

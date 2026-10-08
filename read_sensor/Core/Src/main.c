@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "display.h"
+#include "touch.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -109,13 +110,18 @@ int main(void)
   fill_screen(COLOR_BLUE);
 
 
-  draw_char(10, 20, '.', COLOR_WHITE, 3);
-  draw_char(40, 20, '%', COLOR_WHITE, 3);
-  draw_char(80, 20, ':', COLOR_WHITE, 3);
 
 
 
 
+
+
+
+  uint16_t x;
+  uint16_t y;
+
+  draw_rectangle(20,50,40,40,COLOR_WHITE);
+  draw_text(21,51,"ACTION",COLOR_RED,2);
 
 
   /* USER CODE END 2 */
@@ -125,6 +131,32 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
+
+    if(TOUCH_WasPressed()){
+    		if(TOUCH_Read(&x,&y) == HAL_OK){
+    			char msg[80];
+
+    			snprintf(msg, sizeof(msg),
+    			         "X=%u Y=%u\r\n",
+    			         x,
+    			         y);
+
+    			HAL_UART_Transmit(&huart2,
+    			                  (uint8_t *)msg,
+    			                  strlen(msg),
+    			                  100);
+    			if ((x >= 10) && (x < 100) &&
+    					(y >= 50) && (y <100)){
+    				char msg[] = "Button AKTUELL gedrueckt\r\n";
+
+    				            HAL_UART_Transmit(&huart2,
+    				                              (uint8_t *)msg,
+    				                              strlen(msg),
+    				                              100);
+    			}
+    		}
+    }
+
 
     /* USER CODE BEGIN 3 */
   }
