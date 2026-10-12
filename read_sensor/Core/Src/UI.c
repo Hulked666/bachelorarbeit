@@ -1,5 +1,6 @@
 #include "UI.h"
 #include "display.h"
+#include "stats.h"
 #include <stdio.h>
 #include <stdint.h>
 
@@ -20,6 +21,8 @@ static int last_press_display;
 
 
 static UI_View_t current_state = CURRENT_VIEW;
+
+
 
 HAL_StatusTypeDef UI_DrawTempBox(float temperature);
 HAL_StatusTypeDef UI_DrawHumBox(int humidity);
@@ -204,4 +207,9 @@ void UI_SetMeasurement(float temperature, int humidity, int pressure){
 	current_temperature = temperature;
 	current_humidity = humidity;
 	current_pressure = pressure;
+}
+
+HAL_StatusTypeDef UI_DrawDaily(void){
+	DailyStats_t daily;
+	CREATE_Daily(&daily);
 }

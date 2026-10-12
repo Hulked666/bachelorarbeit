@@ -17,8 +17,8 @@ HAL_StatusTypeDef STATS_Update(StatsStruct_t *stats, float value){
 	if(stats == 0){
 		return HAL_ERROR;
 	}else if(stats->count == 0){
-		stats-> min = value;
-		stats-> max = value;
+		stats->min = value;
+		stats->max = value;
 	}else{
 		if(value < stats->min){
 			stats->min = value;
@@ -102,4 +102,19 @@ HAL_StatusTypeDef STATS_UpdateAll(float temperature, float pressure, float humid
 			return status;
 		}
 	return HAL_OK;
+}
+
+void STATS_Reset(void){
+	temp_stats.max = 0.0f;
+	temp_stats.min = 0.0f;
+	temp_stats.count = 0;
+	temp_stats.sum = 0.0f;
+	hum_stats.max = 0.0f;
+	hum_stats.min = 0.0f;
+	hum_stats.count = 0;
+	hum_stats.sum = 0.0f;
+	press_stats.max = 0.0f;
+	press_stats.min = 0.0f;
+	press_stats.count = 0;
+	press_stats.sum = 0.0f;
 }

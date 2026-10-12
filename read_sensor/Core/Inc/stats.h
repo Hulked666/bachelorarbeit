@@ -31,4 +31,7 @@ typedef struct{
 
 
 HAL_StatusTypeDef STATS_UpdateAll(float temperature, float pressure, float humidity);
+void STATS_Reset(void);
+HAL_StatusTypeDef CREATE_Daily(DailyStats_t *daily);
+
 #endif /* INC_STATS_H_ */

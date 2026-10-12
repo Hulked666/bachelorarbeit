@@ -22,6 +22,7 @@
 #include "stats.h"
 #include "UI.h"
 #include "display.h"
+#include "rtc_app.h"
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
@@ -111,6 +112,12 @@ int main(void)
   MX_SPI1_Init();
   MX_RTC_Init();
   /* USER CODE BEGIN 2 */
+  RTC_DateTime_t current_time;
+  RTC_DateTime_t last_time;
+
+  DailyStats_t daily;
+
+
   float temperature;
   float pressure;
   float humidity;
@@ -136,6 +143,8 @@ int main(void)
   }
 
   UI_DrawCurrent();
+
+  RTC_GetDateTime(&last_time);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -146,11 +155,30 @@ int main(void)
 
 
 	  if((HAL_GetTick() - last_measurement) >= 1000){
-		  HAL_StatusTypeDef status;
+
 		  last_measurement = HAL_GetTick();
+		 status = RTC_GetDateTime(&current_time);
+		 if(status != HAL_OK){
+			 continue;
+		 }
+		  if((current_time.day   != last_time.day)   ||
+		     (current_time.month != last_time.month) ||
+		     (current_time.year  != last_time.year))
+		  {
+			  status = CREATE_Daily(&daily);
+			  if(status != HAL_OK){
+				  continue;;
+			  }
+			  status = ADD_Daily(&daily);
+			  if(status != HAL_OK){
+				  continue;;
+			  }
+			  STATS_Reset();
+		  }
+		  last_time = current_time;
 		  status = BME280_ReadMesurements(&temperature,&pressure,&humidity);
 		  if(status != HAL_OK){
-			  return status;
+			  continue;;
 		  }
 		  snprintf(msg, sizeof(msg),
 		           "T=%.2f H=%.2f P=%.2f\r\n",
@@ -164,7 +192,7 @@ int main(void)
 		                    100);
 		  status = STATS_UpdateAll(temperature, pressure, humidity);
 		  if(status != HAL_OK){
-			  return status;
+			  continue;;
 		  }
 		  UI_SetMeasurement(temperature, (int)humidity, (int)pressure);
 		  UI_DrawValues();
