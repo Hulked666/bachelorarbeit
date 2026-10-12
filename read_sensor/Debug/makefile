@@ -61,7 +61,7 @@ main-build: bachelor_weather.elf secondary-outputs
 
 # Tool invocations
 bachelor_weather.elf bachelor_weather.map: $(OBJS) $(USER_OBJS) C:\Users\marko\OneDrive\Dokumente\bachelorarbeit\read_sensor\STM32L476RGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "bachelor_weather.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\marko\OneDrive\Dokumente\bachelorarbeit\read_sensor\STM32L476RGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="bachelor_weather.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+	arm-none-eabi-gcc -o "bachelor_weather.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\marko\OneDrive\Dokumente\bachelorarbeit\read_sensor\STM32L476RGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="bachelor_weather.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

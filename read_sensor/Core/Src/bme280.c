@@ -4,6 +4,7 @@
 #include "bme280.h"
 #include <stdbool.h>
 extern I2C_HandleTypeDef hi2c1;
+extern UART_HandleTypeDef huart2;
 
 uint8_t buff[1];
 uint16_t dev_adr = 0x76 << 1;
@@ -22,8 +23,7 @@ static uint32_t raw_temperature;
 static uint32_t raw_pressure;
 static uint16_t raw_humidity;
 
-
-static uint32_t t_fine;
+static int32_t t_fine;
 
 
 
@@ -53,12 +53,12 @@ calibrationData_t calibrationData;
 	  status = read_data(id_adr,&chip_id,1);
 	  if(status == HAL_OK){
 		if(ref_adr == chip_id){
-			return 1;
+			return true;
 		}else{
-			return 0;
+			return false;
 		}
 		}else{
-			return 0;
+			return false;
 	  }
   }
 
@@ -251,7 +251,7 @@ static HAL_StatusTypeDef wait_for_measurement(uint32_t time){
 
 }
 // reading sensor raw data before compensation
-static HAL_StatusTypeDef read_raw_data(void){
+ HAL_StatusTypeDef read_raw_data(void){
 	HAL_StatusTypeDef status;
 	uint8_t buffer[8];
 	status = read_data(reg_raw_data, buffer,8);
@@ -368,7 +368,9 @@ static uint32_t compensate_humidity(uint16_t adc_H)
     return (uint32_t)(value >> 12);
 }
 
-HAL_StatusTypeDef BME280ReadMesurements(float *temperature, float *pressure, float *humidity){
+
+
+HAL_StatusTypeDef BME280_ReadMesurements(float *temperature, float *pressure, float *humidity){
 	HAL_StatusTypeDef status;
 	status = trigger_forced_mes();
 	if(status != HAL_OK){
@@ -385,10 +387,41 @@ HAL_StatusTypeDef BME280ReadMesurements(float *temperature, float *pressure, flo
 			return status;
 		}
 
-
-	*temperature = compensate_temp(raw_temperature) / 100.f;
+	*temperature = compensate_temp(raw_temperature) / 100.0f;
 	*pressure = compensate_pressure(raw_pressure) / 25600.0f;
 	*humidity = compensate_humidity(raw_humidity) / 1024.0f;
+
+	return HAL_OK;
+}
+
+HAL_StatusTypeDef BME280_Init(void){
+	bool active = true;
+	HAL_StatusTypeDef status;
+
+	if(read_chip_id() == false){
+		return HAL_ERROR;
+	}
+
+	status = soft_reset();
+	if(status != HAL_OK){
+		return status;
+	}
+	while(active == true){
+	status = im_update(&active);
+	if(status != HAL_OK){
+		return status;
+	}
+	HAL_Delay(5);
+	}
+	status = read_calibration_data();
+	if(status != HAL_OK){
+		return status;
+	}
+
+	status = set_hum_oversampling();
+	if(status != HAL_OK){
+		return status;
+	}
 
 	return HAL_OK;
 }

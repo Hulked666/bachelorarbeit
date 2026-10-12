@@ -29,9 +29,9 @@ typedef struct {
 
 } calibrationData_t;
 
-
-
 HAL_StatusTypeDef BME280_ReadCalibration(calibrationData_t *data);
+HAL_StatusTypeDef BME280_ReadMesurements(float *temperature, float *pressure, float *humidity);
+HAL_StatusTypeDef BME280_Init(void);
 
 
 

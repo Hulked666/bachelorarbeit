@@ -1,0 +1,5 @@
+../Core/Src/stats.c:15:19:STATS_Update	5
+../Core/Src/stats.c:37:7:STATS_Mean	3
+../Core/Src/stats.c:50:19:CREATE_Daily	2
+../Core/Src/stats.c:71:19:ADD_Daily	3
+../Core/Src/stats.c:90:19:STATS_UpdateAll	4

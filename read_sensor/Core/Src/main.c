@@ -18,10 +18,14 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include <stdio.h>
-#include <string.h>
+#include "bme280.h"
+#include "stats.h"
+#include "UI.h"
 #include "display.h"
-#include "touch.h"
+#include <stdio.h>
+#include <stdint.h>
+#include <string.h>
+
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -46,6 +50,8 @@
 /* Private variables ---------------------------------------------------------*/
 I2C_HandleTypeDef hi2c1;
 
+RTC_HandleTypeDef hrtc;
+
 SPI_HandleTypeDef hspi1;
 
 UART_HandleTypeDef huart2;
@@ -60,6 +66,7 @@ static void MX_GPIO_Init(void);
 static void MX_I2C1_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_SPI1_Init(void);
+static void MX_RTC_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -102,28 +109,33 @@ int main(void)
   MX_I2C1_Init();
   MX_USART2_UART_Init();
   MX_SPI1_Init();
+  MX_RTC_Init();
   /* USER CODE BEGIN 2 */
-  HAL_Delay(500);
+  float temperature;
+  float pressure;
+  float humidity;
 
-  display_init();
+  uint32_t last_measurement = 0;
 
-  fill_screen(COLOR_BLUE);
+  char msg[120];
 
+  HAL_StatusTypeDef status;
 
+  status = BME280_Init();
 
+  if(status != HAL_OK)
+  {
+      Error_Handler();
+  }
 
+  status = display_init();
 
+  if(status != HAL_OK)
+  {
+      Error_Handler();
+  }
 
-
-
-
-  uint16_t x;
-  uint16_t y;
-
-  draw_rectangle(20,50,40,40,COLOR_WHITE);
-  draw_text(21,51,"ACTION",COLOR_RED,2);
-
-
+  UI_DrawCurrent();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -132,32 +144,31 @@ int main(void)
   {
     /* USER CODE END WHILE */
 
-    if(TOUCH_WasPressed()){
-    		if(TOUCH_Read(&x,&y) == HAL_OK){
-    			char msg[80];
 
-    			snprintf(msg, sizeof(msg),
-    			         "X=%u Y=%u\r\n",
-    			         x,
-    			         y);
+	  if((HAL_GetTick() - last_measurement) >= 1000){
+		  HAL_StatusTypeDef status;
+		  last_measurement = HAL_GetTick();
+		  status = BME280_ReadMesurements(&temperature,&pressure,&humidity);
+		  if(status != HAL_OK){
+			  return status;
+		  }
+		  snprintf(msg, sizeof(msg),
+		           "T=%.2f H=%.2f P=%.2f\r\n",
+		           temperature,
+		           humidity,
+		           pressure);
 
-    			HAL_UART_Transmit(&huart2,
-    			                  (uint8_t *)msg,
-    			                  strlen(msg),
-    			                  100);
-    			if ((x >= 10) && (x < 100) &&
-    					(y >= 50) && (y <100)){
-    				char msg[] = "Button AKTUELL gedrueckt\r\n";
-
-    				            HAL_UART_Transmit(&huart2,
-    				                              (uint8_t *)msg,
-    				                              strlen(msg),
-    				                              100);
-    			}
-    		}
-    }
-
-
+		  HAL_UART_Transmit(&huart2,
+		                    (uint8_t *)msg,
+		                    strlen(msg),
+		                    100);
+		  status = STATS_UpdateAll(temperature, pressure, humidity);
+		  if(status != HAL_OK){
+			  return status;
+		  }
+		  UI_SetMeasurement(temperature, (int)humidity, (int)pressure);
+		  UI_DrawValues();
+	  }
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -179,10 +190,16 @@ void SystemClock_Config(void)
     Error_Handler();
   }
 
+  /** Configure LSE Drive Capability
+  */
+  HAL_PWR_EnableBkUpAccess();
+  __HAL_RCC_LSEDRIVE_CONFIG(RCC_LSEDRIVE_LOW);
+
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI|RCC_OSCILLATORTYPE_LSE;
+  RCC_OscInitStruct.LSEState = RCC_LSE_ON;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
@@ -261,6 +278,42 @@ static void MX_I2C1_Init(void)
 }
 
 /**
+  * @brief RTC Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_RTC_Init(void)
+{
+
+  /* USER CODE BEGIN RTC_Init 0 */
+
+  /* USER CODE END RTC_Init 0 */
+
+  /* USER CODE BEGIN RTC_Init 1 */
+
+  /* USER CODE END RTC_Init 1 */
+
+  /** Initialize RTC Only
+  */
+  hrtc.Instance = RTC;
+  hrtc.Init.HourFormat = RTC_HOURFORMAT_24;
+  hrtc.Init.AsynchPrediv = 127;
+  hrtc.Init.SynchPrediv = 255;
+  hrtc.Init.OutPut = RTC_OUTPUT_DISABLE;
+  hrtc.Init.OutPutRemap = RTC_OUTPUT_REMAP_NONE;
+  hrtc.Init.OutPutPolarity = RTC_OUTPUT_POLARITY_HIGH;
+  hrtc.Init.OutPutType = RTC_OUTPUT_TYPE_OPENDRAIN;
+  if (HAL_RTC_Init(&hrtc) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN RTC_Init 2 */
+
+  /* USER CODE END RTC_Init 2 */
+
+}
+
+/**
   * @brief SPI1 Initialization Function
   * @param None
   * @retval None
@@ -283,7 +336,7 @@ static void MX_SPI1_Init(void)
   hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
   hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
   hspi1.Init.NSS = SPI_NSS_SOFT;
-  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_32;
+  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
   hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
   hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
   hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;

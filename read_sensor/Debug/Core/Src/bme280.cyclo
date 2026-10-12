@@ -11,8 +11,9 @@
 ../Core/Src/bme280.c:202:26:trigger_forced_mes	1
 ../Core/Src/bme280.c:209:26:is_mesuring	3
 ../Core/Src/bme280.c:227:26:wait_for_measurement	4
-../Core/Src/bme280.c:254:26:read_raw_data	2
+../Core/Src/bme280.c:254:20:read_raw_data	2
 ../Core/Src/bme280.c:271:16:compensate_temp	1
 ../Core/Src/bme280.c:295:17:compensate_pressure	2
 ../Core/Src/bme280.c:336:17:compensate_humidity	3
-../Core/Src/bme280.c:371:19:BME280ReadMesurements	4
+../Core/Src/bme280.c:373:19:BME280_ReadMesurements	4
+../Core/Src/bme280.c:397:19:BME280_Init	7

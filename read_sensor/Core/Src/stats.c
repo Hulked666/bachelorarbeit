@@ -10,7 +10,7 @@ static StatsStruct_t press_stats;
 
 static DailyStats_t history[7];
 
-static uint8_t histoy_count = 0;
+static uint8_t history_count = 0;
 
 HAL_StatusTypeDef STATS_Update(StatsStruct_t *stats, float value){
 
@@ -84,5 +84,22 @@ HAL_StatusTypeDef ADD_Daily(DailyStats_t *stats){
 		history[5] = history[6];
 		history[6] = *stats;
 	}
+	return HAL_OK;
+}
+
+HAL_StatusTypeDef STATS_UpdateAll(float temperature, float pressure, float humidity){
+	HAL_StatusTypeDef status;
+	status = STATS_Update(&temp_stats,temperature);
+	if(status != HAL_OK){
+		return status;
+	}
+	status = STATS_Update(&press_stats,pressure);
+	if(status != HAL_OK){
+		return status;
+	}
+	status = STATS_Update(&hum_stats,humidity);
+	if(status != HAL_OK){
+			return status;
+		}
 	return HAL_OK;
 }

@@ -1,0 +1,9 @@
+../Core/Src/UI.c:31:19:UI_DrawCurrent	1
+../Core/Src/UI.c:50:19:UI_DrawValues	1
+../Core/Src/UI.c:57:19:UI_DrawTempBox	1
+../Core/Src/UI.c:65:19:UI_DrawHumBox	1
+../Core/Src/UI.c:77:19:UI_TempValueUpdate	7
+../Core/Src/UI.c:131:26:UI_HumValueUpdate	5
+../Core/Src/UI.c:176:19:UI_DrawPressBox	1
+../Core/Src/UI.c:185:26:UI_PressValueUpdate	2
+../Core/Src/UI.c:203:6:UI_SetMeasurement	1

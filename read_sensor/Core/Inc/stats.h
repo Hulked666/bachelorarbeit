@@ -2,6 +2,8 @@
 #ifndef INC_STATS_H_
 #define INC_STATS_H_
 
+
+#include "stm32l4xx_hal.h"
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
@@ -28,4 +30,5 @@ typedef struct{
 }DailyStats_t;
 
 
+HAL_StatusTypeDef STATS_UpdateAll(float temperature, float pressure, float humidity);
 #endif /* INC_STATS_H_ */

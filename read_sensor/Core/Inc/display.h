@@ -23,6 +23,7 @@
 #define COLOR_BLUE      0x001F
 #define COLOR_YELLOW    0xFFE0
 #define COLOR_CYAN      0x07FF
+#define COLOR_ORANGE 0xEB00
 
 /* Öffentliche Displayfunktionen */
 HAL_StatusTypeDef display_init(void);
