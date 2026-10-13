@@ -30,6 +30,7 @@ HAL_StatusTypeDef UI_DrawPressBox(int pressure);
 static HAL_StatusTypeDef UI_TempValueUpdate(float temperature);
 static HAL_StatusTypeDef UI_HumValueUpdate(int humidity);
 static HAL_StatusTypeDef UI_PressValueUpdate(int pressure);
+HAL_StatusTypeDef UI_DrawDaily(void);
 
 HAL_StatusTypeDef UI_DrawCurrent(void){
 
@@ -209,7 +210,99 @@ void UI_SetMeasurement(float temperature, int humidity, int pressure){
 	current_pressure = pressure;
 }
 
-HAL_StatusTypeDef UI_DrawDaily(void){
+HAL_StatusTypeDef UI_DrawDailyStatic(void){
+	draw_rectangle(0,0,320,20,COLOR_BLUE);
+	draw_rectangle(0,210,106,30,COLOR_CYAN);
+	draw_rectangle(106,210,106,30,COLOR_CYAN);
+	draw_rectangle(212,210,108,30,COLOR_CYAN);
+	draw_rectangle(0,20,106,190,COLOR_WHITE);
+	draw_rectangle(107,20,106,190,COLOR_WHITE);
+	draw_rectangle(214,20,106,190,COLOR_WHITE);
+	draw_text(12,213,"AKTUELL",COLOR_WHITE,2);
+	draw_text(141,213,"TAG",COLOR_WHITE,2);
+	draw_text(237,213,"7 TAGE",COLOR_WHITE,2);
+    draw_text(24,42,"TEMPERATUR", COLOR_BLACK,1);
+    draw_text(32,59,"MINIMUM", COLOR_BLACK,1);
+    draw_text(32,90,"MAXIMUM", COLOR_BLACK,1);
+    draw_text(24,101,"MITTELWERT", COLOR_BLACK,1);
+    draw_text(124,42,"FEUCHTIGKEIT", COLOR_BLACK,1);
+    draw_text(138,59,"MINIMUM", COLOR_BLACK,1);
+    draw_text(138,90,"MAXIMUM", COLOR_BLACK,1);
+    draw_text(131,101,"MITTELWERT", COLOR_BLACK,1);
+    draw_text(240,42,"LUFTDRUCK", COLOR_BLACK,1);
+    draw_text(246,59,"MINIMUM", COLOR_BLACK,1);
+    draw_text(246,90,"MAXIMUM", COLOR_BLACK,1);
+    draw_text(238,101,"MITTELWERT", COLOR_BLACK,1);
+    return HAL_OK;
+}
+
+HAL_StatusTypeDef UI_DrawDailyTemp(DailyStats_t *daily){
+	char min_read[20];
+	char max_read[20];
+	char mean_read[20];
+
+	snprintf(min_read, sizeof(min_read), "%.1f \xB0""C", daily->temp_min);
+	snprintf(max_read, sizeof(max_read), "%.1f \xB0""C", daily->temp_max);
+	snprintf(mean_read, sizeof(mean_read), "%.1f \xB0""C", daily->temp_mean);
+
+	draw_text(17,67,min_read,COLOR_BLACK,2);
+	draw_text(17,98,max_read,COLOR_BLACK,2);
+	draw_text(17,109,mean_read,COLOR_BLACK,2);
+
+	return HAL_OK;
+}
+
+HAL_StatusTypeDef UI_DrawDailyHum(DailyStats_t *daily){
+	char min_read[20];
+	char max_read[20];
+	char mean_read[20];
+
+	snprintf(min_read, sizeof(min_read), "%d %%", daily->hum_max);
+	snprintf(max_read, sizeof(max_read), "%d %%", daily->hum_min);
+	snprintf(mean_read, sizeof(mean_read), "%d %%", daily->hum_mean);
+
+	draw_text(128,67,min_read,COLOR_BLACK,2);
+	draw_text(128,98,max_read,COLOR_BLACK,2);
+	draw_text(128,109,mean_read,COLOR_BLACK,2);
+
+	return HAL_OK;
+}
+
+HAL_StatusTypeDef UI_DrawDailyPress(DailyStats_t *daily){
+	char min_read[20];
+	char max_read[20];
+	char mean_read[20];
+
+	snprintf(min_read,sizeof(min_read),"%d hPa",daily->press_min);
+	snprintf(max_read,sizeof(max_read),"%d hPa",daily->press_max);
+	snprintf(mean_read,sizeof(mean_read),"%d hPa",daily->press_mean);
+
+	draw_text(244,67,min_read,COLOR_BLACK,2);
+	draw_text(244,98,max_read,COLOR_BLACK,2);
+	draw_text(244,109,mean_read,COLOR_BLACK,2);
+}
+
+HAL_StatusTypeDef UI_DrawDailyValues(void){
+	HAL_StatusTypeDef status;
 	DailyStats_t daily;
-	CREATE_Daily(&daily);
+	status = CREATE_Daily(&daily);
+	if(status != HAL_OK){
+		return status;
+	}
+	status = UI_DrawDailyTemp(&daily);
+	if(status != HAL_OK){
+		return status;
+	}
+	status = UI_DrawDailyHum(&daily);
+	if(status != HAL_OK){
+		return status;
+	}
+	status = UI_DrawDailyPress(&daily);
+	if(status != HAL_OK){
+		return status;
+	}
+
+
+	return HAL_OK;
+
 }
