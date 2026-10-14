@@ -19,11 +19,6 @@ static uint16_t last_hum_color;
 static int last_press_display;
 
 
-
-static UI_View_t current_state = CURRENT_VIEW;
-
-
-
 HAL_StatusTypeDef UI_DrawTempBox(float temperature);
 HAL_StatusTypeDef UI_DrawHumBox(int humidity);
 HAL_StatusTypeDef UI_DrawPressBox(int pressure);
@@ -304,5 +299,19 @@ HAL_StatusTypeDef UI_DrawDailyValues(void){
 
 
 	return HAL_OK;
+
+}
+
+
+HAL_StatusTypeDef UI_DrawHistoryStatic(void){
+	draw_rectangle(0,0,106,30,COLOR_WHITE);
+	draw_rectangle(106,0,106,30,COLOR_WHITE);
+	draw_rectangle(212,0,108,30,COLOR_WHITE);
+	draw_rectangle(0,210,106,30,COLOR_WHITE);
+	draw_rectangle(106,210,106,30,COLOR_WHITE);
+	draw_rectangle(212,210,108,30,COLOR_WHITE);
+	draw_text(12,213,"AKTUELL",COLOR_WHITE,2);
+	draw_text(141,213,"TAG",COLOR_WHITE,2);
+	draw_text(237,213,"7 TAGE",COLOR_WHITE,2);
 
 }

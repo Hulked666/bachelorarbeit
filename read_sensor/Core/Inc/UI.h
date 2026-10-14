@@ -10,6 +10,13 @@ typedef enum{
 	HISTORY_VIEW
 } UI_View_t;
 
+typedef enum
+{
+    HISTORY_TEMP,
+    HISTORY_HUM,
+    HISTORY_PRESS
+} UI_HistoryMetric_t;
+
 
 HAL_StatusTypeDef UI_DrawCurrent(void);
 void UI_SetMeasurement(float temperature, int humidity, int pressure);

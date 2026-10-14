@@ -118,3 +118,15 @@ void STATS_Reset(void){
 	press_stats.count = 0;
 	press_stats.sum = 0.0f;
 }
+
+HAL_StatusTypeDef STATS_GetHistory(DailyStats_t *buffer, uint8_t *count){
+	if(buffer == NULL || count == NULL)
+	{
+	    return HAL_ERROR;
+	}
+	for(int i = 0; i < (history_count);i++){
+		buffer[i] = history[i];
+	}
+	*count = history_count;
+	return HAL_OK;
+}

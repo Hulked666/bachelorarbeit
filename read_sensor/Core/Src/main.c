@@ -195,7 +195,28 @@ int main(void)
 			  continue;;
 		  }
 		  UI_SetMeasurement(temperature, (int)humidity, (int)pressure);
-		  UI_DrawValues();
+		  if(current_state == CURRENT_VIEW){
+			  UI_DrawValues();
+		  }else if(current_state == DAILY_VIEW){
+			  UI_DrawDailyValues();
+		  }
+	  }
+
+
+	  if(TOUCH_WasPressed()){
+		  uint16_t x;
+		  uint16_t y;
+		  if(TOUCH_Read(&x,&y) == HAL_OK){
+			  if(((x > 0) && (x <= 105)) && ((y >= 210) && (y < 240))){
+				  current_state = CURRENT_VIEW;
+				  UI_DrawCurrent();
+			  }else if(((x > 105) && (x <= 211)) && ((y >= 210) && (y < 240))){
+				  current_state = DAILY_VIEW;
+				  UI_DrawDailyStatic();
+			  }else if(((x > 211) && (x <= 319)) && ((y >= 210) && (y < 240))){
+				  current_state = HISTORY_VIEW;
+			  }
+		  }
 	  }
     /* USER CODE BEGIN 3 */
   }

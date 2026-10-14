@@ -6,17 +6,17 @@
 extern I2C_HandleTypeDef hi2c1;
 extern UART_HandleTypeDef huart2;
 
-uint8_t buff[1];
-uint16_t dev_adr = 0x76 << 1;
-uint16_t id_adr = 0xD0;
-uint8_t ref_adr = 0x60;
-uint8_t resetReg = 0xE0;
-uint8_t calibReg = 0x88;
-uint8_t calibReg2 = 0xE1;
-uint8_t reg_ctrl_hum = 0xF2;
-uint8_t reg_ctrl_meas =  0xf4;
-uint8_t reg_status = 0xf3;
-uint8_t reg_raw_data = 0xf7;
+const uint8_t buff[1];
+const uint16_t dev_adr = 0x76 << 1;
+const uint16_t id_adr = 0xD0;
+const uint8_t ref_adr = 0x60;
+const uint8_t resetReg = 0xE0;
+const uint8_t calibReg = 0x88;
+const uint8_t calibReg2 = 0xE1;
+const uint8_t reg_ctrl_hum = 0xF2;
+const uint8_t reg_ctrl_meas =  0xf4;
+const uint8_t reg_status = 0xf3;
+const uint8_t reg_raw_data = 0xf7;
 
 
 static uint32_t raw_temperature;
@@ -198,7 +198,7 @@ static HAL_StatusTypeDef set_hum_oversampling(void){
 	return status;
 }
 
-//sets oversampampling for temp and humidity and triggers forced mode
+//sets oversampampling for temp and pressure and triggers forced mode
 static HAL_StatusTypeDef trigger_forced_mes(void){
 	HAL_StatusTypeDef status;
 	uint8_t rate = 0x25;
