@@ -3,3 +3,5 @@
 ../Core/Src/stats.c:50:19:CREATE_Daily	16	static
 ../Core/Src/stats.c:71:19:ADD_Daily	24	static
 ../Core/Src/stats.c:90:19:STATS_UpdateAll	32	static
+../Core/Src/stats.c:107:6:STATS_Reset	4	static
+../Core/Src/stats.c:122:19:STATS_GetHistory	32	static

@@ -1,5 +1,5 @@
-../Core/Src/touch.c:19:17:touch_read_raw	40	static
-../Core/Src/touch.c:45:19:TOUCH_ReadRaw	16	static
-../Core/Src/touch.c:53:19:TOUCH_Read	24	static
-../Core/Src/touch.c:82:6:TOUCH_IsPressed	8	static
-../Core/Src/touch.c:94:6:TOUCH_WasPressed	8	static
+../Core/Src/touch.c:20:17:touch_read_raw	152	static
+../Core/Src/touch.c:59:19:TOUCH_ReadRaw	16	static
+../Core/Src/touch.c:67:19:TOUCH_Read	136	static
+../Core/Src/touch.c:110:6:TOUCH_IsPressed	8	static
+../Core/Src/touch.c:122:6:TOUCH_WasPressed	8	static

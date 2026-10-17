@@ -1,9 +1,4 @@
-/*
- * display.c
- *
- *  Created on: 02.10.2026
- *      Author: marko
- */
+
 
 #ifndef INC_DISPLAY_H
 #define INC_DISPLAY_H
@@ -11,11 +6,11 @@
 #include "stm32l4xx_hal.h"
 #include <stdint.h>
 
-/* Displaygröße */
+
 #define DISPLAY_WIDTH   320U
 #define DISPLAY_HEIGHT  240U
 
-/* RGB565 Farben */
+
 #define COLOR_BLACK     0x0000
 #define COLOR_WHITE     0xFFFF
 #define COLOR_RED       0xF800
@@ -25,7 +20,7 @@
 #define COLOR_CYAN      0x07FF
 #define COLOR_ORANGE 0xEB00
 
-/* Öffentliche Displayfunktionen */
+
 HAL_StatusTypeDef display_init(void);
 
 HAL_StatusTypeDef draw_pixel(uint16_t x,

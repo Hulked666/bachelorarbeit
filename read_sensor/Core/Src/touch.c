@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <string.h>
 
 
 #define TOUCH_RAW_Y_LEFT    3650U
@@ -12,7 +13,7 @@
 #define TOUCH_RAW_X_BOTTOM   520U
 
 extern SPI_HandleTypeDef hspi1;
-
+extern UART_HandleTypeDef huart2;
 
 
 
@@ -33,6 +34,19 @@ static uint16_t touch_read_raw(uint8_t command){
 	                            rx,
 	                            3,
 	                            100);
+	    char msg[100];
+
+	    snprintf(msg, sizeof(msg),
+	             "CMD=0x%02X RX=%02X %02X %02X\r\n",
+	             command,
+	             rx[0],
+	             rx[1],
+	             rx[2]);
+
+	    HAL_UART_Transmit(&huart2,
+	                      (uint8_t *)msg,
+	                      strlen(msg),
+	                      100);
 
 	    HAL_GPIO_WritePin(TOUCH_CS_GPIO_Port, TOUCH_CS_Pin, GPIO_PIN_SET);
 
@@ -73,8 +87,22 @@ HAL_StatusTypeDef TOUCH_Read(uint16_t *x, uint16_t *y ){
 		raw_y = TOUCH_RAW_Y_RIGHT;
 	}
 
+	char msg[100];
+
+
+
 	*x = ((uint32_t)(TOUCH_RAW_Y_LEFT - raw_y) * 319) / (TOUCH_RAW_Y_LEFT - TOUCH_RAW_Y_RIGHT);
 	*y = ((uint32_t)(TOUCH_RAW_X_TOP - raw_x) * 239) / (TOUCH_RAW_X_TOP - TOUCH_RAW_X_BOTTOM);
+
+	snprintf(msg, sizeof(msg),
+	         "RAW X=%u Y=%u\r\n",
+	         raw_x,
+	         raw_y);
+
+	HAL_UART_Transmit(&huart2,
+	                  (uint8_t *)msg,
+	                  strlen(msg),
+	                  100);
 
 	return HAL_OK;
 }

@@ -18,6 +18,9 @@ static uint16_t last_hum_color;
 
 static int last_press_display;
 
+UI_HistoryMetric_t history_metric;
+
+
 
 HAL_StatusTypeDef UI_DrawTempBox(float temperature);
 HAL_StatusTypeDef UI_DrawHumBox(int humidity);
@@ -310,8 +313,121 @@ HAL_StatusTypeDef UI_DrawHistoryStatic(void){
 	draw_rectangle(0,210,106,30,COLOR_WHITE);
 	draw_rectangle(106,210,106,30,COLOR_WHITE);
 	draw_rectangle(212,210,108,30,COLOR_WHITE);
-	draw_text(12,213,"AKTUELL",COLOR_WHITE,2);
-	draw_text(141,213,"TAG",COLOR_WHITE,2);
-	draw_text(237,213,"7 TAGE",COLOR_WHITE,2);
+	draw_rectangle(1,31,46,178,COLOR_WHITE);
+	draw_rectangle(48,31,44,178,COLOR_WHITE);
+	draw_rectangle(93,31,44,178,COLOR_WHITE);
+	draw_rectangle(138,31,44,178,COLOR_WHITE);
+	draw_rectangle(183,31,44,178,COLOR_WHITE);
+	draw_rectangle(228,31,44,178,COLOR_WHITE);
+	draw_rectangle(273,31,46,178,COLOR_WHITE);
+	draw_text(12,213,"AKTUELL",COLOR_BLACK,2);
+	draw_text(141,213,"TAG",COLOR_BLACK,2);
+	draw_text(237,213,"7 TAGE",COLOR_BLACK,2);
+	draw_text(12,8,"FEUCHTE",COLOR_BLACK,2);
+	draw_text(128,8,"TEMP",COLOR_BLACK,2);
+	draw_text(228,8,"DRUCK",COLOR_BLACK,2);
 
+	return HAL_OK;
+
+}
+
+static HAL_StatusTypeDef UI_DrawHistoryMetric(DailyStats_t *history,
+                                              uint8_t count,
+                                              UI_HistoryMetric_t metric)
+{
+    char date_read[12];
+    char max_read[16];
+    char mean_read[16];
+    char min_read[16];
+
+    uint16_t x_pos[7] = {1, 48, 93, 138, 183, 228, 273};
+
+    if(history == NULL)
+    {
+        return HAL_ERROR;
+    }
+
+    if(count > 7)
+    {
+        count = 7;
+    }
+
+    for(uint8_t i = 0; i < count; i++)
+    {
+        float max_value;
+        float mean_value;
+        float min_value;
+
+        uint16_t x = x_pos[i];
+
+        switch(metric)
+        {
+            case HISTORY_TEMP:
+                max_value = history[i].temp_max;
+                mean_value = history[i].temp_mean;
+                min_value = history[i].temp_min;
+
+                snprintf(max_read, sizeof(max_read), "%.1f", max_value);
+                snprintf(mean_read, sizeof(mean_read), "%.1f", mean_value);
+                snprintf(min_read, sizeof(min_read), "%.1f", min_value);
+                break;
+
+            case HISTORY_HUM:
+                max_value = history[i].hum_max;
+                mean_value = history[i].hum_mean;
+                min_value = history[i].hum_min;
+
+                snprintf(max_read, sizeof(max_read), "%.0f", max_value);
+                snprintf(mean_read, sizeof(mean_read), "%.0f", mean_value);
+                snprintf(min_read, sizeof(min_read), "%.0f", min_value);
+                break;
+
+            case HISTORY_PRESS:
+                max_value = history[i].press_max;
+                mean_value = history[i].press_mean;
+                min_value = history[i].press_min;
+
+                snprintf(max_read, sizeof(max_read), "%.0f", max_value);
+                snprintf(mean_read, sizeof(mean_read), "%.0f", mean_value);
+                snprintf(min_read, sizeof(min_read), "%.0f", min_value);
+                break;
+
+            default:
+                return HAL_ERROR;
+        }
+
+        snprintf(date_read,
+                 sizeof(date_read),
+                 "%02u.%02u",
+                 history[i].day,
+                 history[i].month);
+
+        draw_text(x + 3, 38, date_read, COLOR_BLACK, 1);
+
+        draw_text(x + 5, 70, "MAX", COLOR_BLACK, 1);
+        draw_text(x + 3, 82, max_read, COLOR_BLACK, 1);
+
+        draw_text(x + 5, 110, "AVG", COLOR_BLACK, 1);
+        draw_text(x + 3, 122, mean_read, COLOR_BLACK, 1);
+
+        draw_text(x + 5, 150, "MIN", COLOR_BLACK, 1);
+        draw_text(x + 3, 162, min_read, COLOR_BLACK, 1);
+    }
+
+    return HAL_OK;
+}
+
+HAL_StatusTypeDef UI_DrawHistoryValues(void)
+{
+    DailyStats_t history[7];
+    uint8_t count;
+    HAL_StatusTypeDef status;
+
+    status = STATS_GetHistory(history, &count);
+    if(status != HAL_OK)
+    {
+        return status;
+    }
+
+    return UI_DrawHistoryMetric(history, count, history_metric);
 }

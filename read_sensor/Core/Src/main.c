@@ -23,6 +23,7 @@
 #include "UI.h"
 #include "display.h"
 #include "rtc_app.h"
+#include "touch.h"
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
@@ -145,6 +146,9 @@ int main(void)
   UI_DrawCurrent();
 
   RTC_GetDateTime(&last_time);
+
+  static UI_View_t current_state = CURRENT_VIEW;
+  static UI_HistoryMetric_t current_metric = HISTORY_HUM;
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -180,16 +184,7 @@ int main(void)
 		  if(status != HAL_OK){
 			  continue;;
 		  }
-		  snprintf(msg, sizeof(msg),
-		           "T=%.2f H=%.2f P=%.2f\r\n",
-		           temperature,
-		           humidity,
-		           pressure);
 
-		  HAL_UART_Transmit(&huart2,
-		                    (uint8_t *)msg,
-		                    strlen(msg),
-		                    100);
 		  status = STATS_UpdateAll(temperature, pressure, humidity);
 		  if(status != HAL_OK){
 			  continue;;
@@ -203,20 +198,61 @@ int main(void)
 	  }
 
 
-	  if(TOUCH_WasPressed()){
-		  uint16_t x;
-		  uint16_t y;
-		  if(TOUCH_Read(&x,&y) == HAL_OK){
-			  if(((x > 0) && (x <= 105)) && ((y >= 210) && (y < 240))){
-				  current_state = CURRENT_VIEW;
-				  UI_DrawCurrent();
-			  }else if(((x > 105) && (x <= 211)) && ((y >= 210) && (y < 240))){
-				  current_state = DAILY_VIEW;
-				  UI_DrawDailyStatic();
-			  }else if(((x > 211) && (x <= 319)) && ((y >= 210) && (y < 240))){
-				  current_state = HISTORY_VIEW;
-			  }
-		  }
+	  if(TOUCH_WasPressed())
+	  {
+	      uint16_t x;
+	      uint16_t y;
+
+	      if(TOUCH_Read(&x, &y) == HAL_OK)
+	      {
+	    	  snprintf(msg, sizeof(msg),
+	    	           "TOUCH x=%u y=%u state=%d\r\n",
+	    	           x, y, current_state);
+
+	    	  HAL_UART_Transmit(&huart2,
+	    	                    (uint8_t *)msg,
+	    	                    strlen(msg),
+	    	                    100);
+
+	          if(y >= 210 && y < 240)
+	          {
+	              if(x <= 105)
+	              {
+	                  current_state = CURRENT_VIEW;
+	                  UI_DrawCurrent();
+	              }
+	              else if(x <= 211)
+	              {
+	                  current_state = DAILY_VIEW;
+	                  UI_DrawDailyStatic();
+	              }
+	              else
+	              {
+	                  current_state = HISTORY_VIEW;
+	                  UI_DrawHistoryStatic();
+	              }
+	          }
+
+	          else if(current_state == HISTORY_VIEW &&
+	                  y < 30)
+	          {
+	              if(x <= 105)
+	              {
+	                  current_metric = HISTORY_HUM;
+	              }
+	              else if(x <= 211)
+	              {
+	                  current_metric = HISTORY_TEMP;
+	              }
+	              else
+	              {
+	                  current_metric = HISTORY_PRESS;
+	              }
+
+	              UI_DrawHistoryStatic();
+	              UI_DrawHistoryValues();
+	          }
+	      }
 	  }
     /* USER CODE BEGIN 3 */
   }
