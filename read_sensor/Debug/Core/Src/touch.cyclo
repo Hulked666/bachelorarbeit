@@ -1,5 +1,5 @@
 ../Core/Src/touch.c:20:17:touch_read_raw	1
-../Core/Src/touch.c:59:19:TOUCH_ReadRaw	1
-../Core/Src/touch.c:67:19:TOUCH_Read	6
-../Core/Src/touch.c:110:6:TOUCH_IsPressed	2
-../Core/Src/touch.c:122:6:TOUCH_WasPressed	3
+../Core/Src/touch.c:48:19:TOUCH_ReadRaw	1
+../Core/Src/touch.c:56:19:TOUCH_Read	6
+../Core/Src/touch.c:104:6:TOUCH_IsPressed	2
+../Core/Src/touch.c:116:6:TOUCH_WasPressed	3

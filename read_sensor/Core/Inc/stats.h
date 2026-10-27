@@ -41,5 +41,6 @@ HAL_StatusTypeDef ADD_Daily(DailyStats_t *stats);
 HAL_StatusTypeDef STATS_UpdateAll(float temperature, float pressure, float humidity);
 void STATS_Reset(void);
 HAL_StatusTypeDef STATS_GetHistory(DailyStats_t *buffer, uint8_t *count);
+HAL_StatusTypeDef STATS_RestoreHistory(DailyStats_t *stats, uint8_t value);
 
 #endif /* INC_STATS_H_ */

@@ -8,6 +8,7 @@ C_SRCS += \
 ../Core/Src/UI.c \
 ../Core/Src/bme280.c \
 ../Core/Src/display.c \
+../Core/Src/flash_storage.c \
 ../Core/Src/font.c \
 ../Core/Src/main.c \
 ../Core/Src/rtc_app.c \
@@ -23,6 +24,7 @@ OBJS += \
 ./Core/Src/UI.o \
 ./Core/Src/bme280.o \
 ./Core/Src/display.o \
+./Core/Src/flash_storage.o \
 ./Core/Src/font.o \
 ./Core/Src/main.o \
 ./Core/Src/rtc_app.o \
@@ -38,6 +40,7 @@ C_DEPS += \
 ./Core/Src/UI.d \
 ./Core/Src/bme280.d \
 ./Core/Src/display.d \
+./Core/Src/flash_storage.d \
 ./Core/Src/font.d \
 ./Core/Src/main.d \
 ./Core/Src/rtc_app.d \
@@ -57,7 +60,7 @@ Core/Src/%.o Core/Src/%.su Core/Src/%.cyclo: ../Core/Src/%.c Core/Src/subdir.mk
 clean: clean-Core-2f-Src
 
 clean-Core-2f-Src:
-	-$(RM) ./Core/Src/UI.cyclo ./Core/Src/UI.d ./Core/Src/UI.o ./Core/Src/UI.su ./Core/Src/bme280.cyclo ./Core/Src/bme280.d ./Core/Src/bme280.o ./Core/Src/bme280.su ./Core/Src/display.cyclo ./Core/Src/display.d ./Core/Src/display.o ./Core/Src/display.su ./Core/Src/font.cyclo ./Core/Src/font.d ./Core/Src/font.o ./Core/Src/font.su ./Core/Src/main.cyclo ./Core/Src/main.d ./Core/Src/main.o ./Core/Src/main.su ./Core/Src/rtc_app.cyclo ./Core/Src/rtc_app.d ./Core/Src/rtc_app.o ./Core/Src/rtc_app.su ./Core/Src/stats.cyclo ./Core/Src/stats.d ./Core/Src/stats.o ./Core/Src/stats.su ./Core/Src/stm32l4xx_hal_msp.cyclo ./Core/Src/stm32l4xx_hal_msp.d ./Core/Src/stm32l4xx_hal_msp.o ./Core/Src/stm32l4xx_hal_msp.su ./Core/Src/stm32l4xx_it.cyclo ./Core/Src/stm32l4xx_it.d ./Core/Src/stm32l4xx_it.o ./Core/Src/stm32l4xx_it.su ./Core/Src/syscalls.cyclo ./Core/Src/syscalls.d ./Core/Src/syscalls.o ./Core/Src/syscalls.su ./Core/Src/sysmem.cyclo ./Core/Src/sysmem.d ./Core/Src/sysmem.o ./Core/Src/sysmem.su ./Core/Src/system_stm32l4xx.cyclo ./Core/Src/system_stm32l4xx.d ./Core/Src/system_stm32l4xx.o ./Core/Src/system_stm32l4xx.su ./Core/Src/touch.cyclo ./Core/Src/touch.d ./Core/Src/touch.o ./Core/Src/touch.su
+	-$(RM) ./Core/Src/UI.cyclo ./Core/Src/UI.d ./Core/Src/UI.o ./Core/Src/UI.su ./Core/Src/bme280.cyclo ./Core/Src/bme280.d ./Core/Src/bme280.o ./Core/Src/bme280.su ./Core/Src/display.cyclo ./Core/Src/display.d ./Core/Src/display.o ./Core/Src/display.su ./Core/Src/flash_storage.cyclo ./Core/Src/flash_storage.d ./Core/Src/flash_storage.o ./Core/Src/flash_storage.su ./Core/Src/font.cyclo ./Core/Src/font.d ./Core/Src/font.o ./Core/Src/font.su ./Core/Src/main.cyclo ./Core/Src/main.d ./Core/Src/main.o ./Core/Src/main.su ./Core/Src/rtc_app.cyclo ./Core/Src/rtc_app.d ./Core/Src/rtc_app.o ./Core/Src/rtc_app.su ./Core/Src/stats.cyclo ./Core/Src/stats.d ./Core/Src/stats.o ./Core/Src/stats.su ./Core/Src/stm32l4xx_hal_msp.cyclo ./Core/Src/stm32l4xx_hal_msp.d ./Core/Src/stm32l4xx_hal_msp.o ./Core/Src/stm32l4xx_hal_msp.su ./Core/Src/stm32l4xx_it.cyclo ./Core/Src/stm32l4xx_it.d ./Core/Src/stm32l4xx_it.o ./Core/Src/stm32l4xx_it.su ./Core/Src/syscalls.cyclo ./Core/Src/syscalls.d ./Core/Src/syscalls.o ./Core/Src/syscalls.su ./Core/Src/sysmem.cyclo ./Core/Src/sysmem.d ./Core/Src/sysmem.o ./Core/Src/sysmem.su ./Core/Src/system_stm32l4xx.cyclo ./Core/Src/system_stm32l4xx.d ./Core/Src/system_stm32l4xx.o ./Core/Src/system_stm32l4xx.su ./Core/Src/touch.cyclo ./Core/Src/touch.d ./Core/Src/touch.o ./Core/Src/touch.su
 
 .PHONY: clean-Core-2f-Src
 

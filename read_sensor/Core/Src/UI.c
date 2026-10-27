@@ -19,6 +19,7 @@ static uint16_t last_hum_color;
 static int last_press_display;
 
 UI_HistoryMetric_t history_metric;
+static UI_HistoryMetric_t current_metric = HISTORY_HUM;
 
 
 
@@ -208,76 +209,103 @@ void UI_SetMeasurement(float temperature, int humidity, int pressure){
 	current_pressure = pressure;
 }
 
-HAL_StatusTypeDef UI_DrawDailyStatic(void){
-	draw_rectangle(0,0,320,20,COLOR_BLUE);
-	draw_rectangle(0,210,106,30,COLOR_CYAN);
-	draw_rectangle(106,210,106,30,COLOR_CYAN);
-	draw_rectangle(212,210,108,30,COLOR_CYAN);
-	draw_rectangle(0,20,106,190,COLOR_WHITE);
-	draw_rectangle(107,20,106,190,COLOR_WHITE);
-	draw_rectangle(214,20,106,190,COLOR_WHITE);
-	draw_text(12,213,"AKTUELL",COLOR_WHITE,2);
-	draw_text(141,213,"TAG",COLOR_WHITE,2);
-	draw_text(237,213,"7 TAGE",COLOR_WHITE,2);
-    draw_text(24,42,"TEMPERATUR", COLOR_BLACK,1);
-    draw_text(32,59,"MINIMUM", COLOR_BLACK,1);
-    draw_text(32,90,"MAXIMUM", COLOR_BLACK,1);
-    draw_text(24,101,"MITTELWERT", COLOR_BLACK,1);
-    draw_text(124,42,"FEUCHTIGKEIT", COLOR_BLACK,1);
-    draw_text(138,59,"MINIMUM", COLOR_BLACK,1);
-    draw_text(138,90,"MAXIMUM", COLOR_BLACK,1);
-    draw_text(131,101,"MITTELWERT", COLOR_BLACK,1);
-    draw_text(240,42,"LUFTDRUCK", COLOR_BLACK,1);
-    draw_text(246,59,"MINIMUM", COLOR_BLACK,1);
-    draw_text(246,90,"MAXIMUM", COLOR_BLACK,1);
-    draw_text(238,101,"MITTELWERT", COLOR_BLACK,1);
+HAL_StatusTypeDef UI_DrawDailyStatic(void)
+{
+    fill_screen(COLOR_BLACK);
+
+    draw_rectangle(0,   20, 106, 190, COLOR_WHITE);
+    draw_rectangle(107, 20, 106, 190, COLOR_WHITE);
+    draw_rectangle(214, 20, 106, 190, COLOR_WHITE);
+
+    draw_text(10, 28, "TEMPERATUR",  COLOR_BLACK, 1);
+    draw_text(122, 28, "FEUCHTE",    COLOR_BLACK, 1);
+    draw_text(232, 28, "LUFTDRUCK",  COLOR_BLACK, 1);
+
+    draw_text(27, 55, "MINIMUM", COLOR_BLACK, 1);
+    draw_text(134, 55, "MINIMUM", COLOR_BLACK, 1);
+    draw_text(241, 55, "MINIMUM", COLOR_BLACK, 1);
+
+    draw_text(27, 105, "MAXIMUM", COLOR_BLACK, 1);
+    draw_text(134, 105, "MAXIMUM", COLOR_BLACK, 1);
+    draw_text(241, 105, "MAXIMUM", COLOR_BLACK, 1);
+
+    draw_text(20, 155, "MITTEL", COLOR_BLACK, 1);
+    draw_text(127, 155, "MITTEL", COLOR_BLACK, 1);
+    draw_text(234, 155, "MITTEL", COLOR_BLACK, 1);
+
+    draw_rectangle(0,   210, 106, 30, COLOR_CYAN);
+    draw_rectangle(106, 210, 106, 30, COLOR_CYAN);
+    draw_rectangle(212, 210, 108, 30, COLOR_CYAN);
+
+    draw_text(12, 219, "AKTUELL", COLOR_WHITE, 1);
+    draw_text(147, 219, "TAG",     COLOR_WHITE, 1);
+    draw_text(240, 219, "7 TAGE",  COLOR_WHITE, 1);
+
     return HAL_OK;
 }
 
-HAL_StatusTypeDef UI_DrawDailyTemp(DailyStats_t *daily){
-	char min_read[20];
-	char max_read[20];
-	char mean_read[20];
+static HAL_StatusTypeDef UI_DrawDailyTemp(DailyStats_t *daily)
+{
+    char value[16];
 
-	snprintf(min_read, sizeof(min_read), "%.1f \xB0""C", daily->temp_min);
-	snprintf(max_read, sizeof(max_read), "%.1f \xB0""C", daily->temp_max);
-	snprintf(mean_read, sizeof(mean_read), "%.1f \xB0""C", daily->temp_mean);
+    if(daily == NULL)
+    {
+        return HAL_ERROR;
+    }
+    draw_rectangle(4, 68, 98, 25, COLOR_WHITE);
+    snprintf(value, sizeof(value), "%.1f C", daily->temp_min);
+    draw_text(18, 72, value, COLOR_BLACK, 2);
+    draw_rectangle(4, 118, 98, 25, COLOR_WHITE);
+    snprintf(value, sizeof(value), "%.1f C", daily->temp_max);
+    draw_text(18, 122, value, COLOR_BLACK, 2);
+    draw_rectangle(4, 168, 98, 25, COLOR_WHITE);
+    snprintf(value, sizeof(value), "%.1f C",daily->temp_mean);
+    draw_text(18, 172, value, COLOR_BLACK, 2);
 
-	draw_text(17,67,min_read,COLOR_BLACK,2);
-	draw_text(17,98,max_read,COLOR_BLACK,2);
-	draw_text(17,109,mean_read,COLOR_BLACK,2);
-
-	return HAL_OK;
+    return HAL_OK;
 }
 
-HAL_StatusTypeDef UI_DrawDailyHum(DailyStats_t *daily){
-	char min_read[20];
-	char max_read[20];
-	char mean_read[20];
+static HAL_StatusTypeDef UI_DrawDailyHum(DailyStats_t *daily)
+{
+    char value[16];
 
-	snprintf(min_read, sizeof(min_read), "%d %%", daily->hum_max);
-	snprintf(max_read, sizeof(max_read), "%d %%", daily->hum_min);
-	snprintf(mean_read, sizeof(mean_read), "%d %%", daily->hum_mean);
+    if(daily == NULL)
+    {
+        return HAL_ERROR;
+    }
 
-	draw_text(128,67,min_read,COLOR_BLACK,2);
-	draw_text(128,98,max_read,COLOR_BLACK,2);
-	draw_text(128,109,mean_read,COLOR_BLACK,2);
+    draw_rectangle(111, 68, 98, 25, COLOR_WHITE);
+    snprintf(value, sizeof(value), "%.0f %%", daily->hum_min);
+    draw_text(132, 72, value, COLOR_BLACK,2);
+    draw_rectangle(111, 118, 98, 25, COLOR_WHITE);
+    snprintf(value, sizeof(value), "%.0f %%", daily->hum_max);
+    draw_text(132, 122,value, COLOR_BLACK,2);
+    draw_rectangle(111, 168, 98, 25, COLOR_WHITE);
+    snprintf(value, sizeof(value),"%.0f %%",daily->hum_mean);
+    draw_text(132, 172,value,COLOR_BLACK,2);
 
-	return HAL_OK;
+    return HAL_OK;
 }
 
-HAL_StatusTypeDef UI_DrawDailyPress(DailyStats_t *daily){
-	char min_read[20];
-	char max_read[20];
-	char mean_read[20];
+static HAL_StatusTypeDef UI_DrawDailyPress(DailyStats_t *daily)
+{
+    char value[16];
 
-	snprintf(min_read,sizeof(min_read),"%d hPa",daily->press_min);
-	snprintf(max_read,sizeof(max_read),"%d hPa",daily->press_max);
-	snprintf(mean_read,sizeof(mean_read),"%d hPa",daily->press_mean);
+    if(daily == NULL)
+    {
+        return HAL_ERROR;
+    }
+    draw_rectangle(218, 68, 98, 25, COLOR_WHITE);
+    snprintf(value, sizeof(value),"%.0f",daily->press_min);
+    draw_text(235, 72,value,COLOR_BLACK,2);
+    draw_rectangle(218, 118, 98, 25, COLOR_WHITE);
+    snprintf(value, sizeof(value),"%.0f",daily->press_max);
+    draw_text(235, 122,value,COLOR_BLACK,2);
+    draw_rectangle(218, 168, 98, 25, COLOR_WHITE);
+    snprintf(value, sizeof(value),"%.0f",daily->press_mean);
+    draw_text(235, 172,value,COLOR_BLACK,2);
 
-	draw_text(244,67,min_read,COLOR_BLACK,2);
-	draw_text(244,98,max_read,COLOR_BLACK,2);
-	draw_text(244,109,mean_read,COLOR_BLACK,2);
+    return HAL_OK;
 }
 
 HAL_StatusTypeDef UI_DrawDailyValues(void){
@@ -306,41 +334,48 @@ HAL_StatusTypeDef UI_DrawDailyValues(void){
 }
 
 
-HAL_StatusTypeDef UI_DrawHistoryStatic(void){
-	draw_rectangle(0,0,106,30,COLOR_WHITE);
-	draw_rectangle(106,0,106,30,COLOR_WHITE);
-	draw_rectangle(212,0,108,30,COLOR_WHITE);
-	draw_rectangle(0,210,106,30,COLOR_WHITE);
-	draw_rectangle(106,210,106,30,COLOR_WHITE);
-	draw_rectangle(212,210,108,30,COLOR_WHITE);
-	draw_rectangle(1,31,46,178,COLOR_WHITE);
-	draw_rectangle(48,31,44,178,COLOR_WHITE);
-	draw_rectangle(93,31,44,178,COLOR_WHITE);
-	draw_rectangle(138,31,44,178,COLOR_WHITE);
-	draw_rectangle(183,31,44,178,COLOR_WHITE);
-	draw_rectangle(228,31,44,178,COLOR_WHITE);
-	draw_rectangle(273,31,46,178,COLOR_WHITE);
-	draw_text(12,213,"AKTUELL",COLOR_BLACK,2);
-	draw_text(141,213,"TAG",COLOR_BLACK,2);
-	draw_text(237,213,"7 TAGE",COLOR_BLACK,2);
-	draw_text(12,8,"FEUCHTE",COLOR_BLACK,2);
-	draw_text(128,8,"TEMP",COLOR_BLACK,2);
-	draw_text(228,8,"DRUCK",COLOR_BLACK,2);
+HAL_StatusTypeDef UI_DrawHistoryStatic(void)
+{
+    fill_screen(COLOR_BLACK);
 
-	return HAL_OK;
+    draw_rectangle(0,   0, 106, 30, COLOR_WHITE);
+    draw_rectangle(107, 0, 106, 30, COLOR_WHITE);
+    draw_rectangle(214, 0, 106, 30, COLOR_WHITE);
 
+    draw_text(12, 8, "FEUCHTE", COLOR_BLACK, 2);
+    draw_text(128, 8, "TEMP",   COLOR_BLACK, 2);
+    draw_text(228, 8, "DRUCK",  COLOR_BLACK, 2);
+
+    draw_rectangle(0,   31, 45, 178, COLOR_WHITE);
+    draw_rectangle(46,  31, 45, 178, COLOR_WHITE);
+    draw_rectangle(92,  31, 45, 178, COLOR_WHITE);
+    draw_rectangle(138, 31, 45, 178, COLOR_WHITE);
+    draw_rectangle(184, 31, 45, 178, COLOR_WHITE);
+    draw_rectangle(230, 31, 45, 178, COLOR_WHITE);
+    draw_rectangle(276, 31, 44, 178, COLOR_WHITE);
+
+    draw_rectangle(0,   210, 106, 30, COLOR_WHITE);
+    draw_rectangle(107, 210, 106, 30, COLOR_WHITE);
+    draw_rectangle(214, 210, 106, 30, COLOR_WHITE);
+
+    draw_text(12, 219, "AKTUELL", COLOR_BLACK, 1);
+    draw_text(147, 219, "TAG",    COLOR_BLACK, 1);
+    draw_text(237, 219, "7 TAGE", COLOR_BLACK, 1);
+
+    return HAL_OK;
 }
 
-static HAL_StatusTypeDef UI_DrawHistoryMetric(DailyStats_t *history,
-                                              uint8_t count,
-                                              UI_HistoryMetric_t metric)
+static HAL_StatusTypeDef UI_DrawHistoryMetric(
+        DailyStats_t *history,
+        uint8_t count,
+        UI_HistoryMetric_t metric)
 {
-    char date_read[12];
-    char max_read[16];
-    char mean_read[16];
-    char min_read[16];
+    char date_read[8];
+    char max_read[10];
+    char mean_read[10];
+    char min_read[10];
 
-    uint16_t x_pos[7] = {1, 48, 93, 138, 183, 228, 273};
+    uint16_t x_pos[7] ={0, 46, 92, 138, 184, 230, 276};
 
     if(history == NULL)
     {
@@ -363,55 +398,60 @@ static HAL_StatusTypeDef UI_DrawHistoryMetric(DailyStats_t *history,
         switch(metric)
         {
             case HISTORY_TEMP:
-                max_value = history[i].temp_max;
+
+                max_value  = history[i].temp_max;
                 mean_value = history[i].temp_mean;
-                min_value = history[i].temp_min;
+                min_value  = history[i].temp_min;
 
                 snprintf(max_read, sizeof(max_read), "%.1f", max_value);
                 snprintf(mean_read, sizeof(mean_read), "%.1f", mean_value);
-                snprintf(min_read, sizeof(min_read), "%.1f", min_value);
+                snprintf(min_read,sizeof(min_read),"%.1f",min_value);
+
                 break;
+
 
             case HISTORY_HUM:
-                max_value = history[i].hum_max;
-                mean_value = history[i].hum_mean;
-                min_value = history[i].hum_min;
 
-                snprintf(max_read, sizeof(max_read), "%.0f", max_value);
-                snprintf(mean_read, sizeof(mean_read), "%.0f", mean_value);
-                snprintf(min_read, sizeof(min_read), "%.0f", min_value);
+                max_value  = history[i].hum_max;
+                mean_value = history[i].hum_mean;
+                min_value  = history[i].hum_min;
+
+                snprintf(max_read,sizeof(max_read),"%.0f",max_value);
+                snprintf(mean_read,sizeof(mean_read),"%.0f",mean_value);
+                snprintf(min_read,sizeof(min_read),"%.0f",min_value);
+
                 break;
+
 
             case HISTORY_PRESS:
-                max_value = history[i].press_max;
-                mean_value = history[i].press_mean;
-                min_value = history[i].press_min;
 
-                snprintf(max_read, sizeof(max_read), "%.0f", max_value);
-                snprintf(mean_read, sizeof(mean_read), "%.0f", mean_value);
+                max_value  = history[i].press_max;
+                mean_value = history[i].press_mean;
+                min_value  = history[i].press_min;
+
+                snprintf(max_read,sizeof(max_read),"%.0f",max_value);
+
+                snprintf(mean_read,sizeof(mean_read), "%.0f", mean_value);
+
                 snprintf(min_read, sizeof(min_read), "%.0f", min_value);
+
                 break;
+
 
             default:
                 return HAL_ERROR;
         }
 
-        snprintf(date_read,
-                 sizeof(date_read),
-                 "%02u.%02u",
-                 history[i].day,
-                 history[i].month);
 
-        draw_text(x + 3, 38, date_read, COLOR_BLACK, 1);
-
-        draw_text(x + 5, 70, "MAX", COLOR_BLACK, 1);
-        draw_text(x + 3, 82, max_read, COLOR_BLACK, 1);
-
-        draw_text(x + 5, 110, "AVG", COLOR_BLACK, 1);
-        draw_text(x + 3, 122, mean_read, COLOR_BLACK, 1);
-
-        draw_text(x + 5, 150, "MIN", COLOR_BLACK, 1);
-        draw_text(x + 3, 162, min_read, COLOR_BLACK, 1);
+        snprintf(date_read,sizeof(date_read),"%02u.%02u",history[i].day,history[i].month);
+        draw_rectangle(x + 2,34,41,172,COLOR_WHITE);
+        draw_text(x + 7,38,date_read,COLOR_BLACK,1);
+        draw_text(x + 10,68,"MAX",COLOR_BLACK,1);
+        draw_text(x + 7,82,max_read,COLOR_BLACK,1);
+        draw_text(x + 10,112,"AVG",COLOR_BLACK,1);
+        draw_text(x + 7,126,mean_read,COLOR_BLACK,1);
+        draw_text(x + 10,156,"MIN",COLOR_BLACK,1);
+        draw_text(x + 7,170,min_read,COLOR_BLACK,1);
     }
 
     return HAL_OK;
@@ -421,13 +461,15 @@ HAL_StatusTypeDef UI_DrawHistoryValues(void)
 {
     DailyStats_t history[7];
     uint8_t count;
+
     HAL_StatusTypeDef status;
 
-    status = STATS_GetHistory(history, &count);
+    status = STATS_GetHistory(history,&count);
+
     if(status != HAL_OK)
     {
         return status;
     }
 
-    return UI_DrawHistoryMetric(history, count, history_metric);
+    return UI_DrawHistoryMetric(history,count,current_metric);
 }

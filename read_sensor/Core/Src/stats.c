@@ -130,3 +130,18 @@ HAL_StatusTypeDef STATS_GetHistory(DailyStats_t *buffer, uint8_t *count){
 	*count = history_count;
 	return HAL_OK;
 }
+
+
+HAL_StatusTypeDef STATS_RestoreHistory(DailyStats_t *stats, uint8_t value){
+if(stats == NULL){
+return HAL_ERROR;
+}
+if(value > 7){
+return HAL_ERROR;
+}
+for(uint8_t i = 0; i < value ; i++){
+history[i] = stats[i];
+}
+history_count = value;
+return HAL_OK;
+}

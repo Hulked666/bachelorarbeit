@@ -1,6 +1,7 @@
 "./Core/Src/UI.o"
 "./Core/Src/bme280.o"
 "./Core/Src/display.o"
+"./Core/Src/flash_storage.o"
 "./Core/Src/font.o"
 "./Core/Src/main.o"
 "./Core/Src/rtc_app.o"

@@ -24,6 +24,7 @@
 #include "display.h"
 #include "rtc_app.h"
 #include "touch.h"
+#include "flash_storage.h"
 #include <stdio.h>
 #include <stdint.h>
 #include <string.h>
@@ -125,7 +126,7 @@ int main(void)
 
   uint32_t last_measurement = 0;
 
-  char msg[120];
+
 
   HAL_StatusTypeDef status;
 
@@ -149,6 +150,10 @@ int main(void)
 
   static UI_View_t current_state = CURRENT_VIEW;
   static UI_HistoryMetric_t current_metric = HISTORY_HUM;
+
+  status = FLASH_Load();
+
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -171,29 +176,40 @@ int main(void)
 		  {
 			  status = CREATE_Daily(&daily);
 			  if(status != HAL_OK){
-				  continue;;
+				  continue;
 			  }
+			  daily.day   = last_time.day;
+			  daily.month = last_time.month;
+			  daily.year  = last_time.year;
+
 			  status = ADD_Daily(&daily);
 			  if(status != HAL_OK){
-				  continue;;
+				  continue;
+			  }
+			  status = FLASH_Save();
+			  if(status != HAL_OK){
+				  continue;
 			  }
 			  STATS_Reset();
 		  }
 		  last_time = current_time;
 		  status = BME280_ReadMesurements(&temperature,&pressure,&humidity);
 		  if(status != HAL_OK){
-			  continue;;
+			  continue;
 		  }
 
 		  status = STATS_UpdateAll(temperature, pressure, humidity);
 		  if(status != HAL_OK){
-			  continue;;
+			  continue;
 		  }
 		  UI_SetMeasurement(temperature, (int)humidity, (int)pressure);
 		  if(current_state == CURRENT_VIEW){
 			  UI_DrawValues();
 		  }else if(current_state == DAILY_VIEW){
 			  UI_DrawDailyValues();
+		  }else if(current_state == HISTORY_VIEW)
+		  {
+		      UI_DrawHistoryValues(current_metric);
 		  }
 	  }
 
@@ -205,14 +221,7 @@ int main(void)
 
 	      if(TOUCH_Read(&x, &y) == HAL_OK)
 	      {
-	    	  snprintf(msg, sizeof(msg),
-	    	           "TOUCH x=%u y=%u state=%d\r\n",
-	    	           x, y, current_state);
 
-	    	  HAL_UART_Transmit(&huart2,
-	    	                    (uint8_t *)msg,
-	    	                    strlen(msg),
-	    	                    100);
 
 	          if(y >= 210 && y < 240)
 	          {
@@ -230,6 +239,7 @@ int main(void)
 	              {
 	                  current_state = HISTORY_VIEW;
 	                  UI_DrawHistoryStatic();
+	                  UI_DrawHistoryValues(current_metric);
 	              }
 	          }
 
@@ -250,7 +260,7 @@ int main(void)
 	              }
 
 	              UI_DrawHistoryStatic();
-	              UI_DrawHistoryValues();
+	              UI_DrawHistoryValues(current_metric);
 	          }
 	      }
 	  }
@@ -421,7 +431,7 @@ static void MX_SPI1_Init(void)
   hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
   hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
   hspi1.Init.NSS = SPI_NSS_SOFT;
-  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
+  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_32;
   hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
   hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
   hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;

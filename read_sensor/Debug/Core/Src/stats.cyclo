@@ -5,3 +5,4 @@
 ../Core/Src/stats.c:90:19:STATS_UpdateAll	4
 ../Core/Src/stats.c:107:6:STATS_Reset	1
 ../Core/Src/stats.c:122:19:STATS_GetHistory	4
+../Core/Src/stats.c:135:19:STATS_RestoreHistory	4
