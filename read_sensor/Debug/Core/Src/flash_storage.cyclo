@@ -1,1 +1,3 @@
-../Core/Src/flash_storage.c:7:19:FLASH_ErasePage	3
+../Core/Src/flash_storage.c:10:19:FLASH_ErasePage	3
+../Core/Src/flash_storage.c:34:19:FLASH_Save	6
+../Core/Src/flash_storage.c:67:19:FLASH_Load	4

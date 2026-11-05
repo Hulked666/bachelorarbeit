@@ -76,7 +76,7 @@ static void MX_RTC_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-//static void print_bme280_calibration(void);
+
 /* USER CODE END 0 */
 
 /**
@@ -114,6 +114,30 @@ int main(void)
   MX_SPI1_Init();
   MX_RTC_Init();
   /* USER CODE BEGIN 2 */
+
+  if(HAL_RTCEx_BKUPRead(&hrtc, RTC_BKP_DR0) != RTC_MAGIC)
+  {
+	  RTC_TimeTypeDef sTime = {0};
+	  RTC_DateTypeDef sDate = {0};
+
+	  sTime.Hours   = 9;
+	  sTime.Minutes = 21;
+	  sTime.Seconds = 0;
+
+	  sDate.Date  = 28;
+	  sDate.Month = 10;
+	  sDate.Year  = 26;
+
+	  HAL_RTC_SetTime(&hrtc, &sTime, RTC_FORMAT_BIN);
+	  HAL_RTC_SetDate(&hrtc, &sDate, RTC_FORMAT_BIN);
+
+	  HAL_RTCEx_BKUPWrite(&hrtc, RTC_BKP_DR0, RTC_MAGIC);
+  }
+
+
+
+
+
   RTC_DateTime_t current_time;
   RTC_DateTime_t last_time;
 
@@ -125,8 +149,6 @@ int main(void)
   float humidity;
 
   uint32_t last_measurement = 0;
-
-
 
   HAL_StatusTypeDef status;
 
@@ -146,12 +168,25 @@ int main(void)
 
   UI_DrawCurrent();
 
-  RTC_GetDateTime(&last_time);
+  status = RTC_GetDateTime(&last_time);
+	 if(status != HAL_OK){
+		 Error_Handler();
+	 }
+
 
   static UI_View_t current_state = CURRENT_VIEW;
   static UI_HistoryMetric_t current_metric = HISTORY_HUM;
 
   status = FLASH_Load();
+  if(status != HAL_OK)
+  {
+      const char *msg = "Keine gueltigen Flash-Daten vorhanden\r\n";
+
+      HAL_UART_Transmit(&huart2,
+                        (uint8_t *)msg,
+                        strlen(msg),
+                        100);
+  }
 
 
   /* USER CODE END 2 */
@@ -168,32 +203,46 @@ int main(void)
 		  last_measurement = HAL_GetTick();
 		 status = RTC_GetDateTime(&current_time);
 		 if(status != HAL_OK){
-			 continue;
+			 Error_Handler();
 		 }
-		  if((current_time.day   != last_time.day)   ||
-		     (current_time.month != last_time.month) ||
-		     (current_time.year  != last_time.year))
-		  {
-			  status = CREATE_Daily(&daily);
-			  if(status != HAL_OK){
-				  continue;
-			  }
-			  daily.day   = last_time.day;
-			  daily.month = last_time.month;
-			  daily.year  = last_time.year;
 
-			  status = ADD_Daily(&daily);
-			  if(status != HAL_OK){
-				  continue;
-			  }
-			  status = FLASH_Save();
-			  if(status != HAL_OK){
-				  continue;
-			  }
-			  STATS_Reset();
-		  }
-		  last_time = current_time;
-		  status = BME280_ReadMesurements(&temperature,&pressure,&humidity);
+
+
+
+		 if((current_time.day   != last_time.day)   ||
+		    (current_time.month != last_time.month) ||
+		    (current_time.year  != last_time.year))
+		 {
+		     status = CREATE_Daily(&daily);
+
+		     if(status == HAL_OK)
+		     {
+		         daily.day   = last_time.day;
+		         daily.month = last_time.month;
+		         daily.year  = last_time.year;
+
+		         status = ADD_Daily(&daily);
+
+		         if(status == HAL_OK)
+		         {
+		             status = FLASH_Save();
+
+		             if(status != HAL_OK)
+		             {
+		                 const char *flash_msg = "Flash save failed\r\n";
+
+		                 HAL_UART_Transmit(&huart2, (uint8_t *)flash_msg, strlen(flash_msg),100);
+		             }
+
+		             STATS_Reset();
+		         }
+		     }
+		 }
+
+		 last_time = current_time;
+
+
+		 status = BME280_ReadMesurements(&temperature,&pressure,&humidity);
 		  if(status != HAL_OK){
 			  continue;
 		  }
@@ -249,21 +298,29 @@ int main(void)
 	              if(x <= 105)
 	              {
 	                  current_metric = HISTORY_HUM;
+
 	              }
 	              else if(x <= 211)
 	              {
 	                  current_metric = HISTORY_TEMP;
+
 	              }
 	              else
 	              {
 	                  current_metric = HISTORY_PRESS;
+
 	              }
 
+	              char debug[64];
+
+
 	              UI_DrawHistoryStatic();
+
 	              UI_DrawHistoryValues(current_metric);
 	          }
 	      }
 	  }
+
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */

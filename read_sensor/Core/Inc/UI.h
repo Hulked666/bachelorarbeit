@@ -22,7 +22,7 @@ HAL_StatusTypeDef UI_DrawCurrent(void);
 void UI_SetMeasurement(float temperature, int humidity, int pressure);
 HAL_StatusTypeDef UI_DrawValues(void);
 HAL_StatusTypeDef UI_DrawHistoryStatic(void);
-HAL_StatusTypeDef UI_DrawHistoryValues(void);
+HAL_StatusTypeDef UI_DrawHistoryValues(UI_HistoryMetric_t metric);
 HAL_StatusTypeDef UI_DrawDailyValues(void);
 HAL_StatusTypeDef UI_DrawDailyStatic(void);
 

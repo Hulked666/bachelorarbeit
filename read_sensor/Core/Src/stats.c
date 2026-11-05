@@ -132,7 +132,7 @@ HAL_StatusTypeDef STATS_GetHistory(DailyStats_t *buffer, uint8_t *count){
 }
 
 
-HAL_StatusTypeDef STATS_RestoreHistory(DailyStats_t *stats, uint8_t value){
+HAL_StatusTypeDef STATS_RestoreHistory(const DailyStats_t *stats, uint8_t value){
 if(stats == NULL){
 return HAL_ERROR;
 }

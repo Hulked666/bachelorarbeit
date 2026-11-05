@@ -11,6 +11,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#define RTC_MAGIC 0x1234U
+
 
 typedef struct{
 	uint8_t hours;
